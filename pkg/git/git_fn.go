@@ -17,7 +17,7 @@ func Checkout(branchName string) {
 func runShell(command string) {
 	var stdout bytes.Buffer
 	var stderr bytes.Buffer
-	// TODO define type of shell
+	// should expose configuration to select type of shell
 	eCmd := exec.Command("zsh", "-c", command)
 	eCmd.Stdout = &stdout
 	eCmd.Stderr = &stderr
