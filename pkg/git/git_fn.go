@@ -3,8 +3,24 @@ package git
 import (
 	"bytes"
 	"fmt"
+	"os"
 	"os/exec"
 )
+
+func IsGit(path string) bool {
+	entries, err := os.ReadDir(path)
+	if err != nil {
+		fmt.Printf("failed to read directory: %v err: %v\n", path, err)
+		return false
+	}
+
+	for _, entry := range entries {
+		if entry.Name() == ".git" {
+			return true
+		}
+	}
+	return false
+}
 
 func Stash() {
 	runShell("git stash")

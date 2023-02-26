@@ -42,6 +42,10 @@ func runCheckout(cmd *cobra.Command, args []string) {
 		if !entry.IsDir() {
 			continue
 		}
+		if !git.IsGit(filepath.Join(originalWd, entry.Name())) {
+			continue
+		}
+
 		processFolder(entry, originalWd, func() {
 			git.Stash()
 			git.Checkout(args[0])
