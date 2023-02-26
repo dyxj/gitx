@@ -4,12 +4,8 @@ Copyright © 2023 Darren Yim <darrenyxj@gmail.com>
 package cmd
 
 import (
-	"fmt"
 	"github.com/spf13/cobra"
 	"gitx/pkg/git"
-	"log"
-	"os"
-	"path/filepath"
 )
 
 // checkoutCmd represents the Checkout command
@@ -28,46 +24,12 @@ func init() {
 }
 
 func runCheckout(cmd *cobra.Command, args []string) {
-	originalWd, err := os.Getwd()
-	if err != nil {
-		log.Fatalf("%v\n", err)
-	}
-
-	entries, err := os.ReadDir("./")
-	if err != nil {
-		log.Fatalf("%v\n", err)
-	}
-
-	for _, entry := range entries {
-		if !entry.IsDir() {
-			continue
-		}
-		if !git.IsGit(filepath.Join(originalWd, entry.Name())) {
-			continue
-		}
-
-		processFolder(entry, originalWd, func() {
+	processor := git.FolderProcessor{
+		ProcessFn: func(cmd *cobra.Command, args []string) {
 			git.Stash()
 			git.Checkout(args[0])
-			fmt.Println(divider)
-		})
-	}
-}
-
-func processFolder(entry os.DirEntry, originalWd string, processFn func()) {
-	defer func() {
-		err := os.Chdir(originalWd)
-		if err != nil {
-			log.Fatalf("%v\n", err)
-		}
-	}()
-
-	fmt.Println("Project: " + entry.Name())
-	entryPath := filepath.Join(originalWd, entry.Name())
-	err := os.Chdir(entryPath)
-	if err != nil {
-		log.Fatalf("%v\n", err)
+		},
 	}
 
-	processFn()
+	processor.ProcessFolder(cmd, args)
 }
