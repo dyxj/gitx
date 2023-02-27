@@ -4,8 +4,8 @@ Copyright © 2023 Darren Yim <darrenyxj@gmail.com>
 package cmd
 
 import (
+	"github.com/dyxj/gitx/pkg/git"
 	"github.com/spf13/cobra"
-	"gitx/pkg/git"
 )
 
 // checkoutCmd represents the Checkout command

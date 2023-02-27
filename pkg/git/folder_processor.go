@@ -2,8 +2,8 @@ package git
 
 import (
 	"fmt"
+	"github.com/dyxj/gitx/pkg/message"
 	"github.com/spf13/cobra"
-	"gitx/pkg/message"
 	"log"
 	"os"
 	"path/filepath"

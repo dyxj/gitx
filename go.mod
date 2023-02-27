@@ -1,4 +1,4 @@
-module gitx
+module github.com/dyxj/gitx
 
 go 1.19
 
