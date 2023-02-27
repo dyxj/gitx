@@ -30,7 +30,7 @@ import (
 var checkoutCmd = &cobra.Command{
 	Use:   "checkout [arg:branch name]",
 	Args:  cobra.ExactArgs(1),
-	Short: "Checkout specified branch from first level of directories",
+	Short: "Stash current branch and checkout specified branch for first level of directories in current folder",
 	Long: `Performs the following actions to all directories in the current folder
 1. stashes current work
 2. checks out branch specified`,
