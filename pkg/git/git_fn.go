@@ -30,6 +30,10 @@ func Checkout(branchName string) {
 	runShell("git checkout " + branchName)
 }
 
+func Pull() {
+	runShell("git pull")
+}
+
 func runShell(command string) {
 	var stdout bytes.Buffer
 	var stderr bytes.Buffer
