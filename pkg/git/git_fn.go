@@ -34,6 +34,10 @@ func Pull() {
 	runShell("git pull")
 }
 
+func Status() {
+	runShell("git status")
+}
+
 func runShell(command string) {
 	var stdout bytes.Buffer
 	var stderr bytes.Buffer
