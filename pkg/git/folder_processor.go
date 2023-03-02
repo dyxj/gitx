@@ -10,9 +10,10 @@ import (
 )
 
 type FolderProcessor struct {
-	cmd       *cobra.Command
-	args      []string
-	ProcessFn func(cmd *cobra.Command, args []string)
+	cmd               *cobra.Command
+	args              []string
+	projectsProcessed int
+	ProcessFn         func(cmd *cobra.Command, args []string)
 }
 
 func (f *FolderProcessor) ProcessFolder(cmd *cobra.Command, args []string) {
@@ -38,6 +39,10 @@ func (f *FolderProcessor) ProcessFolder(cmd *cobra.Command, args []string) {
 		}
 
 		f.processProject(entry, originalWd)
+		f.projectsProcessed++
+	}
+	if f.projectsProcessed < 1 {
+		fmt.Println("no git projects to process")
 	}
 }
 
