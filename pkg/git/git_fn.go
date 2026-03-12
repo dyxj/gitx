@@ -42,6 +42,10 @@ func ShowCurrentBranch() {
 	runShell("git branch --show-current")
 }
 
+func Push() {
+	runShell("git push")
+}
+
 func runShell(command string) {
 	var stdout bytes.Buffer
 	var stderr bytes.Buffer

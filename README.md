@@ -24,6 +24,7 @@ Available Commands:
   currentbranch Shows current branch on first level of directories in current folder
   help          Help about any command
   pull          Execute git pull on first level of directories in current folder
+  push          Execute git push on first level of directories in current folder
   status        Execute git status on first level of directories in current folder
 
 Flags:
