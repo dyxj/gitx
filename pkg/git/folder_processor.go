@@ -1,6 +1,7 @@
 package git
 
 import (
+	"encoding/json"
 	"fmt"
 	"github.com/dyxj/gitx/pkg/message"
 	"github.com/spf13/cobra"
@@ -16,6 +17,25 @@ type FolderProcessor struct {
 	ProcessFn         func(cmd *cobra.Command, args []string)
 }
 
+type gitxConfig struct {
+	Paths []string `json:"paths"`
+}
+
+func loadGitxConfig(cwd string) (*gitxConfig, error) {
+	data, err := os.ReadFile(filepath.Join(cwd, "gitx.json"))
+	if os.IsNotExist(err) {
+		return nil, nil
+	}
+	if err != nil {
+		return nil, err
+	}
+	var cfg gitxConfig
+	if err := json.Unmarshal(data, &cfg); err != nil {
+		return nil, err
+	}
+	return &cfg, nil
+}
+
 func (f *FolderProcessor) ProcessFolder(cmd *cobra.Command, args []string) {
 	f.cmd = cmd
 	f.args = args
@@ -25,28 +45,49 @@ func (f *FolderProcessor) ProcessFolder(cmd *cobra.Command, args []string) {
 		log.Fatalf("%v\n", err)
 	}
 
-	entries, err := os.ReadDir("./")
+	cfg, err := loadGitxConfig(originalWd)
 	if err != nil {
-		log.Fatalf("%v\n", err)
+		log.Fatalf("error reading gitx.json: %v\n", err)
 	}
 
-	for _, entry := range entries {
-		if !entry.IsDir() {
-			continue
+	if cfg != nil {
+		for _, p := range cfg.Paths {
+			absPath := p
+			if !filepath.IsAbs(p) {
+				absPath = filepath.Join(originalWd, p)
+			}
+			if !IsGit(absPath) {
+				fmt.Printf("warning: %s is not a git repository, skipping\n", absPath)
+				continue
+			}
+			f.processProject(filepath.Base(absPath), absPath, originalWd)
+			f.projectsProcessed++
 		}
-		if !IsGit(filepath.Join(originalWd, entry.Name())) {
-			continue
+	} else {
+		entries, err := os.ReadDir("./")
+		if err != nil {
+			log.Fatalf("%v\n", err)
 		}
 
-		f.processProject(entry, originalWd)
-		f.projectsProcessed++
+		for _, entry := range entries {
+			if !entry.IsDir() {
+				continue
+			}
+			absPath := filepath.Join(originalWd, entry.Name())
+			if !IsGit(absPath) {
+				continue
+			}
+			f.processProject(entry.Name(), absPath, originalWd)
+			f.projectsProcessed++
+		}
 	}
+
 	if f.projectsProcessed < 1 {
 		fmt.Println("no git projects to process")
 	}
 }
 
-func (f *FolderProcessor) processProject(entry os.DirEntry, originalWd string) {
+func (f *FolderProcessor) processProject(name string, absPath string, originalWd string) {
 
 	defer func() {
 		fmt.Println(message.Divider)
@@ -56,9 +97,8 @@ func (f *FolderProcessor) processProject(entry os.DirEntry, originalWd string) {
 		}
 	}()
 
-	fmt.Println("Project: " + entry.Name())
-	entryPath := filepath.Join(originalWd, entry.Name())
-	err := os.Chdir(entryPath)
+	fmt.Println("Project: " + name)
+	err := os.Chdir(absPath)
 	if err != nil {
 		log.Fatalf("%v\n", err)
 	}
